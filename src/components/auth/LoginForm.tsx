@@ -23,7 +23,7 @@ export function LoginForm() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError((err as Error).message);
+      setError('Invalid email or password');
     } finally {
       setIsLoading(false);
     }
