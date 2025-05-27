@@ -1,6 +1,4 @@
 export type LeadStatus = 'new' | 'negotiation' | 'won' | 'lost';
-export type LeadPriority = 'low' | 'medium' | 'high';
-export type LeadSource = 'website' | 'referral' | 'direct' | 'other';
 
 export interface Lead {
   id: string;
@@ -13,6 +11,4 @@ export interface Lead {
   updatedAt: string;
   files?: string[];
   notes?: string;
-  priority?: LeadPriority;
-  source?: LeadSource;
 }
