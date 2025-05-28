@@ -20,10 +20,12 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { Toast } from '../components/common/Toast';
 import { Lead, LeadStatus } from '../types/lead';
 import { getLeads, createLead, updateLeadStatus } from '../services/leadService';
+import { useAuthStore } from '../store/authStore';
 
 const ITEMS_PER_PAGE = 10;
 
 export function LeadManagement() {
+  const { user } = useAuthStore();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,13 +96,19 @@ export function LeadManagement() {
   const handleCreateLead = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user?.id) {
+      showToast('You must be logged in to create leads', 'error');
+      return;
+    }
+    
     try {
       const newLead = await createLead({
         customerName: formData.customerName,
         serviceNeeded: formData.serviceNeeded,
         siteLocation: formData.siteLocation,
         status: 'new',
-        assignedTo: '1', // Mock assignment to first sales agent
+        assignedTo: user.id,
+        createdBy: user.id,
         notes: formData.notes,
       });
       
