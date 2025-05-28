@@ -21,12 +21,23 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ error: null });
           
+          // Check if Supabase is properly configured
+          if (!supabase.auth) {
+            throw new Error('Supabase client is not properly initialized. Please check your configuration.');
+          }
+          
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
           
-          if (error) throw error;
+          if (error) {
+            // Handle specific Supabase errors
+            if (error.message.includes('Failed to fetch')) {
+              throw new Error('Unable to connect to the authentication service. Please check your internet connection or try again later.');
+            }
+            throw error;
+          }
           
           if (!data.session || !data.user) {
             throw new Error('No session or user data returned');
@@ -48,7 +59,8 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
           });
         } catch (error) {
-          set({ error: (error as Error).message });
+          const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+          set({ error: errorMessage });
           throw error;
         }
       },
